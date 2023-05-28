@@ -1,0 +1,1 @@
+var simSize = 800;
