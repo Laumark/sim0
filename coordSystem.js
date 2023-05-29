@@ -1,15 +1,23 @@
 function newClunk(xVal, yVal, clunkType) {
 	clunks.push({x: xVal, y: yVal, clunkType});
+	allClunks.push({x: xVal, y: yVal, clunkType});
 }
 
 var clunks = [];
+var allClunks = [];
 
 // 0 water
 // 1 grass
+// 2 desert
+// 3 dry grass
+// 4 swamp
 
 var clunkColors = [
 	"#bbf2f1",
 	"#32a852",
+	"#f0bb4a",
+	"#ded143",
+	"#3b8048",
 ];
 
 
@@ -37,19 +45,19 @@ function fillNearbyClunk(clunkIndex) {
 		if (r == 0) {
 			var clunkCursorX = x;
 			var clunkCursorY = y - 1;
-			newClunk(clunkCursorX, clunkCursorY, 1);
+			newClunk(clunkCursorX, clunkCursorY, curBiome);
 		} else if (r == 1) {
 			var clunkCursorX = x + 1;
 			var clunkCursorY = y;
-			newClunk(clunkCursorX, clunkCursorY, 1);
+			newClunk(clunkCursorX, clunkCursorY, curBiome);
 		} else if (r == 2) {
 			var clunkCursorX = x;
 			var clunkCursorY = y + 1;
-			newClunk(clunkCursorX, clunkCursorY, 1);
+			newClunk(clunkCursorX, clunkCursorY, curBiome);
 		} else {
 			var clunkCursorX = x - 1;
 			var clunkCursorY = y;
-			newClunk(clunkCursorX, clunkCursorY, 1);
+			newClunk(clunkCursorX, clunkCursorY, curBiome);
 		}
 	} else {
 		clunkFailed = true;
@@ -57,10 +65,10 @@ function fillNearbyClunk(clunkIndex) {
 }
 
 function isClunkFree(x, y) {
-	for (var i = 0; i < clunks.length; i++) {
+	for (var i = 0; i < allClunks.length; i++) {
 		if (x < 0 || x > simSize) return false;
 		if (y < 0 || y > simSize) return false;
-		if (clunks[i].x == x && clunks[i].y == y) {
+		if (allClunks[i].x == x && allClunks[i].y == y) {
 			return false;
 		}
 	}
@@ -71,9 +79,16 @@ function findClunkWithManyFriends() {
 
 	var applicants = [];
 
-	for (var i = 0; i < clunks.length; i++) {
-		var x = clunks[i].x;
-		var y = clunks[i].y;
+	var clunkList;
+	if (clunks.length == 0) {
+		clunkList = allClunks;
+	} else {
+		clunkList = clunks;
+	}
+
+	for (var i = 0; i < clunkList.length; i++) {
+		var x = clunkList[i].x;
+		var y = clunkList[i].y;
 		var n = isClunkFree(x, y - 1);
 		var e = isClunkFree(x + 1, y);
 		var s = isClunkFree(x, y + 1);
@@ -87,7 +102,7 @@ function findClunkWithManyFriends() {
 		}	
 		// console.log("friends: " + friends);
 		if (friends < 4) {
-			var thisClunk = clunks[i];
+			var thisClunk = clunkList[i];
 			applicants.push({clunk: thisClunk, pop: friends, index: i});
 		}
 	}
